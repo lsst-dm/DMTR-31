@@ -1,0 +1,60 @@
+
+
+\documentclass[DM,authoryear,toc]{lsstdoc}
+% lsstdoc documentation: https://lsst-texmf.lsst.io/lsstdoc.html
+
+% Package imports go here.
+
+% Local commands go here.
+
+% To add a short-form title:
+% \title[Short title]{Title}
+\title{S17B HSC PDR1 Reprocessing Report}
+
+% Optional subtitle
+% \setDocSubtitle{A subtitle}
+
+\author{%
+Hsin-Fang Chiang, Greg Daues, and the NCSA team
+}
+
+\setDocRef{TEST-31}
+
+\date{\today}
+
+% Optional: name of the document's curator
+% \setDocCurator{The Curator of this Document}
+
+\setDocAbstract{%
+This document captures information about the large scale HSC reprocessing we performed in Cycle S17B.
+}
+
+% Change history defined here.
+% Order: oldest first.
+% Fields: VERSION, DATE, DESCRIPTION, OWNER NAME.
+% See LPM-51 for version number policy.
+\setDocChangeRecord{%
+  \addtohist{1}{YYY-MM-DD}{Unreleased.}{Hsin-Fang Chiang}
+}
+
+\begin{document}
+
+% Create the title page.
+% Table of contents is added automatically with the "toc" class option.
+\maketitle
+
+% ADD CONTENT HERE
+\section{Dataset Information}
+The input dataset is the HSC Strategic Survey Program (SSP) Public Data Release 1 (PDR1) \citep{2017arXiv170208449A}.
+The PDR1 dataset has been transferred to the LSST GPFS storage /datasets by \jira{DM-9683}.
+
+\section{Hardware}
+
+\section{Software}
+
+
+% Include all the relevant bib files.
+% https://lsst-texmf.lsst.io/lsstdoc.html#bibliographies
+\bibliography{lsst,lsst-dm,refs_ads,refs,books,local}
+
+\end{document}
