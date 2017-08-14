@@ -214,6 +214,40 @@ In multiBandDriver, two patches of WIDE (tract=9934 patch=0,0  and  tract=9938 p
 The multiBandDriver job of WIDE tract=9457 could not finish unless patch=1,8 is excluded. However tract 9457 is actually outside of the PDR1 coverage.
 In forcedPhotCcd, fatal errors were seen about the reference of a patch does not exist; therefore some forced{\_}src were not generated. A JIRA ticket has been filed: \jira{DM-10755}.
 
+\subsection{Low-level processing details}
+
+This section includes low-level details that may only be of interest to the operation team.
+
+The first singleFrame job started on May 8, the last multiband job was May 22, and the last forcedPhotCcd job was on Jun 1.  The processing was done using the Verification Cluster and the GPFS space mounted on it. The NCSA team was responsible of shepherding the run and resolving non-pipeline issues, with close communications with and support from the DRP team regarding the science pipelines.  The "ctrl{\_}pool" style drivers were run on the slurm cluster.
+
+The processing tasks/drivers were run as a total of 8792 slurm jobs:
+\begin{enumerate}
+\item
+514 singleFrame slurm jobs
+\item
+1555 mosaic slurm jobs
+\item
+1555 coadd slurm jobs
+\item
+362 multiband slurm jobs
+\item
+4806 forcedPhotCcd slurm jobs
+\end{enumerate}
+
+For single frame processing, every 11 visits (an arbitrary choice) were grouped into one singleFrameDriver.py command, therefore 5654/11 = 514 jobs in total, and submitted each job to one worker node.  Data of the three layers (DEEP, UDEEP, WIDE) were handled completely separately beginning with the mosaic pipeline step.  skymap.findTractPatchList was used to check through each calexp, find out what tract/patch the ccd overlaps, and write into sqlite3. There are 1555 tract x filter combinations for all three layers. For each tract x filter, all overlapping visits and a template (e.g. mosaic{\_}template.sh) were used to make a slurm job file (such as the .sl file as in \url{https://developer.lsst.io/services/verification.html#verification-slurm}). Similarly for coadd making, each tract x filter was a slurm job, but jobs were submitted using coaddDriver.py.  The multiband processing jobs were submitted for each tract, using multiBandDriver.py.   All numbers here included tracts that were not actually necessary (outside the PDR1 coverage).  For forcedPhotCcd, the CmdLineTask command is written into slurm job files for submission, similar to running mosaic. 21 visits (an arbitrary choice) were grouped in each slurm job in the first batch of submissions; the rest had one visit in each slurm job. In this campaign, at most 24 cores were used on one node at a time and sometimes even fewer.   Hsin-Fang Chiang was aware she did not always run things in the optimal way, and they are to be improved in the coming cycles.
+
+In general, when jobs failed, little effort was spent into investigation as long as the reruns were successful. There were a few transient hardware/file system issues. For example, once a known GPFS hiccup failed two jobs; we happened to know because admins happened to notice it and we happened to match up the timing within a few minutes, but issues like that could easily happen without being noticed.  Other examples of other non-science-pipeline failures are as below.
+
+Failures like the "black hole node" phenomenon were seen a few times. Sometimes many jobs were queued in slurm, and next morning all jobs larger than a job ID were found to be failed without any log being written.  The appearance is that Slurm scheduled numerous jobs in succession, one after another, to a faulty node with a GPFS problem, resulting in a set of failed jobs.   Jobs that started running before that failure point were able to continue as normal. Resubmissions of the same failed jobs were also good.   The observation of a succession of jobs all going to the same problematic node and failing over and over again in a short amount of time motivates an examination of the controller configuration, as there may be Slurm settings that would distribute job and avoid the scenario.
+
+There was an instance that seemed to be a butler repo race condition. When running mosaic processing, multiple jobs seemed to be doing IO with repositoryCfg.yaml and failed at File "/software/lsstsw/stack/Linux64/daf{\_}persistence/13.0-8-gba0f85f/python/lsst/daf/persistence/posixStorage.py", line 189, in putRepositoryCfg and then lsst/daf/persistence/safeFileIo.py", line 84, in FileForWriteOnceCompareSame. Multiple files like "repositoryCfg.yamlGXfgIy" were left in the repo, and they are all the same.  Two possible ways to avoid this: (1) always do a pre-run, or (2) do not let jobs write into the same output repos.
+
+Although large time limits were deliberately used in the slurm jobs, several jobs were timed out and cancelled by slurm, mostly multiband jobs. For new runs, Hsin-Fang Chiang chose to start over with a new output repo rather than letting the driver reuse the existing data. Manual butler repo manipulation was needed to clean up bad executions or combine results.
+
+The pipe{\_}drivers submission could take a while (minutes).
+
+For S17B, the pipeline outputs were written to a production scratch space.  The rerun repos were cleaned up and failures were resolved there. Then the repos were transferred to the archived space at /datasets.  For transferring, this script was helpful: https://wiki.ncsa.illinois.edu/display/~wglick/2013/11/01/Parallel+Rsync
+
 % Include all the relevant bib files.
 % https://lsst-texmf.lsst.io/lsstdoc.html#bibliographies
 \bibliography{lsst,lsst-dm,refs_ads,refs,books,local}
