@@ -84,6 +84,96 @@ lsst-dev01 and the Verification Cluster utilize the General Parallel File System
 
 \section{Software}
 
+The LSST software stack is used. A shared software stack on the GPFS file systems, suitable for computation on the Verification Cluster, has been provided and is maintained by Science Pipelines and is available under /software/lsstsw.
+
+The stack version of $w{\_}2017{\_}17$, published on 26-Apr-2017, was used.
+Besides, the master branch of $meas{\_}mosaic$, $obs{\_}subaru$, and $ctrl{\_}pool$ from 7-May-2017 and built with $w{\_}2017{\_}17$ was used.
+This is equivalent to the week 17 tag with \jira{DM-10315}, \jira{DM-10449}, and \jira{DM-10430}.
+
+Unless otherwise noted, the HSC default config in the stack is used, including the task defaults and $obs{\_}subaru$'s overrides.
+That implies the PS1 reference catalog $ps1{\_}pv3{\_}3pi{\_}20170110$ in the LSST format (HTM indexed) is used (/datasets/refcats/htm/ps1{\_}pv3{\_}3pi{\_}20170110/).
+The calibration dataset is the 20170105 version from Paul Price; the calibration repo is located at /datasets/hsc/calib/20170105 from \jira{DM-9978}.
+The externally provided bright object masks (butler type "brightObjectMask") of version "Arcturus" (\jira{DM-10436}) are added to the repo and applied in coaddDriver.assembleCoadd.
+
+\subsection{Pipeline steps and configs}
+\begin{enumerate}
+\item
+makeSkyMap.py
+\item
+singleFrameDriver.py     Ignore ccd=9 which has bad amps and results not trustworthy even if processCcd passes
+\item
+mosaic.py
+\item
+coaddDriver.py   Make config.assembleCoadd.subregionSize small enough so a full stack of images can fit into memory at once; a trade-off between memory and i/o but doesn't matter scientifically, as the pixels are independent.
+\item
+multiBandDriver.py
+forcedPhotCcd.py   Note: it was added late and hence was not run in the RC processing
+\end{enumerate}
+
+Operational configurations, such as logging configurations in $ctrl{\_}pool$, different from the tagged stack may be used (e.g. \jira{DM-10430}).
+
+In the full PDR1 reprocessing, everything was run with the same stack version and config. Reproducible failures are noted below, but no reprocessing is done with a newer software version.
+
+This stack version had a known science problem about bad ellipticity residuals as reported in \jira{DM-10482}; the bug fix \jira{DM-10688} was merged to the stack on May 30 and hence was not applied in this reprocessing campaign.
+
+\subsection{Units of independent execution}
+
+These pipelines will be run no smaller than these units:
+\begin{enumerate}
+\item
+makeSkyMap.py  One SkyMap for everything
+\item
+singleFrameDriver.py  ccd (typically run per visit)
+\item
+mosaic.py tract x filter, including all visits overlapping that tract in that filter.
+\item
+coaddDriver.py patch x filter, including all visits overlapping that patch in that filter. (typically run per tract)
+\item
+multiBandDriver.py  patch, including all filters. (typically run per tract)
+\item
+forcedPhotCcd.py  ccd
+\end{enumerate}
+Data of different layers (DEEP/UDEEP/WIDE) are processed separately.
+
+\subsection{Example commands for processing}
+\begin{enumerate}
+\item
+\begin{verbatim}
+makeSkyMap.py  makeSkyMap.py /datasets/hsc/repo --rerun private/username/path
+\end{verbatim}
+\item
+\begin{verbatim}
+singleFrameDriver.py  singleFrameDriver.py /datasets/hsc/repo
+  --rerun private/username/path/sfm --batch-type slurm
+  --mpiexec='-bind-to socket' --cores 24 --time 600 --job jobName2
+  --id ccd=0..8^10..103 visit=444
+\end{verbatim}
+\item
+\begin{verbatim}
+mosaic.py mosaic.py /datasets/hsc/repo --rerun private/username/path/sfm:private/username/path/mosaic
+   --numCoresForRead=12 --id ccd=0..8^10..103 visit=444^446^454^456
+   tract=9856 --diagnostics --diagDir=/path/to/mosaic/diag/dir/
+\end{verbatim}
+\item
+\begin{verbatim}
+coaddDriver.py coaddDriver.py /datasets/hsc/repo --rerun private/username/path/mosaic:private/username/path/coadd
+  --batch-type=slurm --mpiexec='-bind-to socket' --job jobName4
+  --time 600 --nodes 1 --procs 12 --id tract=9856 filter=HSC-Y
+  --selectId ccd=0..8^10..103 visit=444^446^454^456
+\end{verbatim}
+\item
+\begin{verbatim}
+multiBandDriver.py  multiBandDriver.py /datasets/hsc/repo --rerun private/username/path/coadd:private/username/path/multiband
+  --batch-type=slurm --mpiexec='-bind-to socket' --job jobName5
+  --time 5000 --nodes 1 --procs 12 --id tract=9856 filter=HSC-Y^HSC-I
+\end{verbatim}
+\item
+\begin{verbatim}
+forcedPhotCcd.py  forcedPhotCcd.py /datasets/hsc/repo --rerun private/username/path/multiband:private/username/path/forced
+   -j 12 --id ccd=0..8^10..103 visit=444
+\end{verbatim}
+\end{enumerate}
+
 
 % Include all the relevant bib files.
 % https://lsst-texmf.lsst.io/lsstdoc.html#bibliographies
