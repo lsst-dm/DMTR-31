@@ -46,7 +46,26 @@ This document captures information about the large scale HSC reprocessing we per
 % ADD CONTENT HERE
 \section{Dataset Information}
 The input dataset is the HSC Strategic Survey Program (SSP) Public Data Release 1 (PDR1) \citep{2017arXiv170208449A}.
-The PDR1 dataset has been transferred to the LSST GPFS storage /datasets by \jira{DM-9683}.
+The PDR1 dataset has been transferred to the LSST GPFS storage /datasets by \jira{DM-9683} and the butler repo is available at /datasets/hsc/repo.
+
+It includes 5654 visits in 7 bands: HSC-G, HSC-R, HSC-I, HSC-Y, HSC-Z, NB0816, NB0921. Their visit IDs are visitId-SSPPDR1.txt.  The official release site is at https://hsc-release.mtk.nao.ac.jp/
+The survey has three layers and includes 8 fields.
+\begin{enumerate}
+\item
+UDEEP: SSP{\_}UDEEP{\_}SXDS, SSP{\_}UDEEP{\_}COSMOS
+\item
+DEEP: SSP{\_}DEEP{\_}ELAIS{\_}N1, SSP{\_}DEEP{\_}DEEP2{\_}3, SSP{\_}DEEP{\_}XMM(S){\_}LSS, SSP{\_}DEEP{\_}COSMOS
+\item
+WIDE: SSP{\_}WIDE, SSP{\_}AEGIS
+\end{enumerate}
+
+The number of visits in each field and band is summarized in the following table.
+\input{datasetTable}
+
+The tract IDs for each field is summarized in the following table.
+\input{tractTable}
+
+Plots of tracts and patches can be found on  https://hsc-release.mtk.nao.ac.jp/doc/index.php/data/. In S17B, more tracts than listed were processed.
 
 \section{Hardware}
 
