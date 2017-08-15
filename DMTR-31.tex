@@ -107,6 +107,7 @@ mosaic.py
 coaddDriver.py   Make config.assembleCoadd.subregionSize small enough so a full stack of images can fit into memory at once; a trade-off between memory and i/o but doesn't matter scientifically, as the pixels are independent.
 \item
 multiBandDriver.py
+\item
 forcedPhotCcd.py   Note: it was added late and hence was not run in the RC processing
 \end{enumerate}
 
@@ -144,32 +145,32 @@ makeSkyMap.py  makeSkyMap.py /datasets/hsc/repo --rerun private/username/path
 \item
 \begin{verbatim}
 singleFrameDriver.py  singleFrameDriver.py /datasets/hsc/repo
-  --rerun private/username/path/sfm --batch-type slurm
+  --rerun private/username/path --batch-type slurm
   --mpiexec='-bind-to socket' --cores 24 --time 600 --job jobName2
   --id ccd=0..8^10..103 visit=444
 \end{verbatim}
 \item
 \begin{verbatim}
-mosaic.py mosaic.py /datasets/hsc/repo --rerun private/username/path/sfm:private/username/path/mosaic
+mosaic.py mosaic.py /datasets/hsc/repo --rerun path1:path2
    --numCoresForRead=12 --id ccd=0..8^10..103 visit=444^446^454^456
    tract=9856 --diagnostics --diagDir=/path/to/mosaic/diag/dir/
 \end{verbatim}
 \item
 \begin{verbatim}
-coaddDriver.py coaddDriver.py /datasets/hsc/repo --rerun private/username/path/mosaic:private/username/path/coadd
+coaddDriver.py coaddDriver.py /datasets/hsc/repo --rerun path2
   --batch-type=slurm --mpiexec='-bind-to socket' --job jobName4
   --time 600 --nodes 1 --procs 12 --id tract=9856 filter=HSC-Y
   --selectId ccd=0..8^10..103 visit=444^446^454^456
 \end{verbatim}
 \item
 \begin{verbatim}
-multiBandDriver.py  multiBandDriver.py /datasets/hsc/repo --rerun private/username/path/coadd:private/username/path/multiband
+multiBandDriver.py  multiBandDriver.py /datasets/hsc/repo --rerun path2
   --batch-type=slurm --mpiexec='-bind-to socket' --job jobName5
   --time 5000 --nodes 1 --procs 12 --id tract=9856 filter=HSC-Y^HSC-I
 \end{verbatim}
 \item
 \begin{verbatim}
-forcedPhotCcd.py  forcedPhotCcd.py /datasets/hsc/repo --rerun private/username/path/multiband:private/username/path/forced
+forcedPhotCcd.py  forcedPhotCcd.py /datasets/hsc/repo --rerun path2
    -j 12 --id ccd=0..8^10..103 visit=444
 \end{verbatim}
 \end{enumerate}
@@ -179,9 +180,11 @@ forcedPhotCcd.py  forcedPhotCcd.py /datasets/hsc/repo --rerun private/username/p
 \subsection{Summary of Outputs}
 All processing were done with the same stack setup. Data of the three layers (UDEEP, DEEP, WIDE) were processed separately.
 The output repositories are at:
+\begin{verbatim}
 /datasets/hsc/repo/rerun/DM-10404/UDEEP/
 /datasets/hsc/repo/rerun/DM-10404/DEEP/
 /datasets/hsc/repo/rerun/DM-10404/WIDE/
+\end{verbatim}
 All logs are at /datasets/hsc/repo/rerun/DM-10404/logs/
 
 While unnecessary, some edge tracts outside of the PDR1 coverage were attempted in the processing this time. Those data outputs are kept in the repos as well. In other words, there are more tracts in the above output repositories than listed in the tract IDs in the table on top of this page; the additional data can be ignored.
@@ -189,7 +192,33 @@ While unnecessary, some edge tracts outside of the PDR1 coverage were attempted 
 \subsection{Reproducible Failures}
 In singleFrameDriver/processCcd, there were reproducible failures in 78 CCDs from 74 visits. Their data IDs are:
 
---id visit=1206 ccd=77 --id visit=6342 ccd=11 --id visit=6478 ccd=99 --id visit=6528 ccd=24 --id visit=6528 ccd=67 --id visit=6542 ccd=96 --id visit=7344 ccd=67 --id visit=7356 ccd=96 --id visit=7372 ccd=29 --id visit=9736 ccd=67 --id visit=9748 ccd=96 --id visit=9838 ccd=101 --id visit=9868 ccd=76 --id visit=11414 ccd=66 --id visit=13166 ccd=20 --id visit=13178 ccd=91 --id visit=13198 ccd=84 --id visit=13288 ccd=84 --id visit=15096 ccd=47 --id visit=15096 ccd=54 --id visit=15206 ccd=100 --id visit=16064 ccd=101 --id visit=17670 ccd=24 --id visit=17672 ccd=24 --id visit=17692 ccd=8 --id visit=17736 ccd=63 --id visit=17738 ccd=69 --id visit=17750 ccd=58 --id visit=19468 ccd=69 --id visit=23680 ccd=77 --id visit=23798 ccd=76 --id visit=24308 ccd=29 --id visit=25894 ccd=68 --id visit=29324 ccd=99 --id visit=29326 ccd=47 --id visit=29936 ccd=66 --id visit=29942 ccd=96 --id visit=29966 ccd=103 --id visit=30004 ccd=95 --id visit=30704 ccd=101 --id visit=32506 ccd=8 --id visit=33862 ccd=8 --id visit=33890 ccd=61 --id visit=33934 ccd=95 --id visit=33964 ccd=101 --id visit=34332 ccd=61 --id visit=34334 ccd=61 --id visit=34412 ccd=78 --id visit=34634 ccd=61 --id visit=34636 ccd=61 --id visit=34928 ccd=61 --id visit=34930 ccd=61 --id visit=34934 ccd=101 --id visit=34936 ccd=50 --id visit=34938 ccd=95 --id visit=35852 ccd=8 --id visit=35862 ccd=61 --id visit=35916 ccd=50 --id visit=35932 ccd=95 --id visit=36640 ccd=68 --id visit=37342 ccd=78 --id visit=37538 ccd=100 --id visit=37590 ccd=85 --id visit=37988 ccd=33 --id visit=38316 ccd=11 --id visit=38328 ccd=91 --id visit=38494 ccd=6 --id visit=38494 ccd=54 --id visit=42454 ccd=24 --id visit=42510 ccd=77 --id visit=42546 ccd=93 --id visit=44060 ccd=31 --id visit=44090 ccd=27 --id visit=44090 ccd=103 --id visit=44094 ccd=101 --id visit=44162 ccd=61 --id visit=46892 ccd=64 --id visit=47004 ccd=101
+\begin{verbatim}
+ --id visit=1206 ccd=77 --id visit=6342 ccd=11 --id visit=6478 ccd=99 --id visit=6528 ccd=24
+ --id visit=6528 ccd=67 --id visit=6542 ccd=96 --id visit=7344 ccd=67 --id visit=7356 ccd=96
+ --id visit=7372 ccd=29 --id visit=9736 ccd=67 --id visit=9748 ccd=96 --id visit=9838 ccd=101
+ --id visit=9868 ccd=76 --id visit=11414 ccd=66 --id visit=13166 ccd=20
+ --id visit=13178 ccd=91 --id visit=13198 ccd=84 --id visit=13288 ccd=84
+ --id visit=15096 ccd=47 --id visit=15096 ccd=54 --id visit=15206 ccd=100
+ --id visit=16064 ccd=101 --id visit=17670 ccd=24 --id visit=17672 ccd=24
+ --id visit=17692 ccd=8 --id visit=17736 ccd=63 --id visit=17738 ccd=69
+ --id visit=17750 ccd=58 --id visit=19468 ccd=69 --id visit=23680 ccd=77
+ --id visit=23798 ccd=76 --id visit=24308 ccd=29 --id visit=25894 ccd=68
+ --id visit=29324 ccd=99 --id visit=29326 ccd=47 --id visit=29936 ccd=66
+ --id visit=29942 ccd=96 --id visit=29966 ccd=103 --id visit=30004 ccd=95
+ --id visit=30704 ccd=101 --id visit=32506 ccd=8 --id visit=33862 ccd=8
+ --id visit=33890 ccd=61 --id visit=33934 ccd=95 --id visit=33964 ccd=101
+ --id visit=34332 ccd=61 --id visit=34334 ccd=61 --id visit=34412 ccd=78
+ --id visit=34634 ccd=61 --id visit=34636 ccd=61 --id visit=34928 ccd=61
+ --id visit=34930 ccd=61 --id visit=34934 ccd=101 --id visit=34936 ccd=50
+ --id visit=34938 ccd=95 --id visit=35852 ccd=8 --id visit=35862 ccd=61
+ --id visit=35916 ccd=50 --id visit=35932 ccd=95 --id visit=36640 ccd=68
+ --id visit=37342 ccd=78 --id visit=37538 ccd=100 --id visit=37590 ccd=85
+ --id visit=37988 ccd=33 --id visit=38316 ccd=11 --id visit=38328 ccd=91
+ --id visit=38494 ccd=6 --id visit=38494 ccd=54 --id visit=42454 ccd=24
+ --id visit=42510 ccd=77 --id visit=42546 ccd=93 --id visit=44060 ccd=31
+ --id visit=44090 ccd=27 --id visit=44090 ccd=103 --id visit=44094 ccd=101
+ --id visit=44162 ccd=61 --id visit=46892 ccd=64 --id visit=47004 ccd=101
+\end{verbatim}
 
 Out of the 78 failures:
 \begin{enumerate}
@@ -214,7 +243,7 @@ In multiBandDriver, two patches of WIDE (tract=9934 patch=0,0  and  tract=9938 p
 The multiBandDriver job of WIDE tract=9457 could not finish unless patch=1,8 is excluded. However tract 9457 is actually outside of the PDR1 coverage.
 In forcedPhotCcd, fatal errors were seen about the reference of a patch does not exist; therefore some forced{\_}src were not generated. A JIRA ticket has been filed: \jira{DM-10755}.
 
-\subsection{Low-level processing details}
+\subsection{Low-level Processing Details}
 
 This section includes low-level details that may only be of interest to the operation team.
 
@@ -233,20 +262,21 @@ The processing tasks/drivers were run as a total of 8792 slurm jobs:
 \item
 4806 forcedPhotCcd slurm jobs
 \end{enumerate}
+Their slurm job IDs can be found on the confluence page.
 
-For single frame processing, every 11 visits (an arbitrary choice) were grouped into one singleFrameDriver.py command, therefore 5654/11 = 514 jobs in total, and submitted each job to one worker node.  Data of the three layers (DEEP, UDEEP, WIDE) were handled completely separately beginning with the mosaic pipeline step.  skymap.findTractPatchList was used to check through each calexp, find out what tract/patch the ccd overlaps, and write into sqlite3. There are 1555 tract x filter combinations for all three layers. For each tract x filter, all overlapping visits and a template (e.g. mosaic{\_}template.sh) were used to make a slurm job file (such as the .sl file as in \url{https://developer.lsst.io/services/verification.html#verification-slurm}). Similarly for coadd making, each tract x filter was a slurm job, but jobs were submitted using coaddDriver.py.  The multiband processing jobs were submitted for each tract, using multiBandDriver.py.   All numbers here included tracts that were not actually necessary (outside the PDR1 coverage).  For forcedPhotCcd, the CmdLineTask command is written into slurm job files for submission, similar to running mosaic. 21 visits (an arbitrary choice) were grouped in each slurm job in the first batch of submissions; the rest had one visit in each slurm job. In this campaign, at most 24 cores were used on one node at a time and sometimes even fewer.   Hsin-Fang Chiang was aware she did not always run things in the optimal way, and they are to be improved in the coming cycles.
+For single frame processing, every 11 visits (an arbitrary choice) were grouped into one singleFrameDriver.py command, therefore 5654/11 = 514 jobs in total, and submitted each job to one worker node.  Data of the three layers (DEEP, UDEEP, WIDE) were handled completely separately beginning with the mosaic pipeline step.  skymap.findTractPatchList was used to check through each calexp, find out what tract/patch the ccd overlaps, and write into sqlite3. There are 1555 tract x filter combinations for all three layers. For each tract x filter, all overlapping visits and a template were used to make a slurm job file (similar to the .sl file as in \url{https://developer.lsst.io/services/verification.html#verification-slurm}). Similarly for coadd making, each tract x filter was a slurm job, but jobs were submitted using coaddDriver.py.  The multiband processing jobs were submitted for each tract, using multiBandDriver.py.   All numbers here included tracts that were not actually necessary (outside the PDR1 coverage).  For forcedPhotCcd, the CmdLineTask command is written into slurm job files for submission, similar to running mosaic. 21 visits (an arbitrary choice) were grouped in each slurm job in the first batch of submissions; the rest had one visit in each slurm job. In this campaign, at most 24 cores were used on one node at a time and sometimes even fewer.   We were aware that jobs were not run in the optimal way, and they are to be improved in the coming cycles.
 
 In general, when jobs failed, little effort was spent into investigation as long as the reruns were successful. There were a few transient hardware/file system issues. For example, once a known GPFS hiccup failed two jobs; we happened to know because admins happened to notice it and we happened to match up the timing within a few minutes, but issues like that could easily happen without being noticed.  Other examples of other non-science-pipeline failures are as below.
 
 Failures like the "black hole node" phenomenon were seen a few times. Sometimes many jobs were queued in slurm, and next morning all jobs larger than a job ID were found to be failed without any log being written.  The appearance is that Slurm scheduled numerous jobs in succession, one after another, to a faulty node with a GPFS problem, resulting in a set of failed jobs.   Jobs that started running before that failure point were able to continue as normal. Resubmissions of the same failed jobs were also good.   The observation of a succession of jobs all going to the same problematic node and failing over and over again in a short amount of time motivates an examination of the controller configuration, as there may be Slurm settings that would distribute job and avoid the scenario.
 
-There was an instance that seemed to be a butler repo race condition. When running mosaic processing, multiple jobs seemed to be doing IO with repositoryCfg.yaml and failed at File "/software/lsstsw/stack/Linux64/daf{\_}persistence/13.0-8-gba0f85f/python/lsst/daf/persistence/posixStorage.py", line 189, in putRepositoryCfg and then lsst/daf/persistence/safeFileIo.py", line 84, in FileForWriteOnceCompareSame. Multiple files like "repositoryCfg.yamlGXfgIy" were left in the repo, and they are all the same.  Two possible ways to avoid this: (1) always do a pre-run, or (2) do not let jobs write into the same output repos.
+There was an instance that seemed to be a butler repo race condition. When running mosaic processing, multiple jobs seemed to be doing IO with repositoryCfg.yaml and failed at File "daf{\_}persistence/13.0-8-gba0f85f/python/lsst/daf/persistence/posixStorage.py", line 189, in putRepositoryCfg and then lsst/daf/persistence/safeFileIo.py", line 84, in FileForWriteOnceCompareSame. Multiple files like "repositoryCfg.yamlGXfgIy" were left in the repo, and they are all the same.  Two possible ways to avoid this: (1) always do a pre-run, or (2) do not let jobs write into the same output repos.
 
-Although large time limits were deliberately used in the slurm jobs, several jobs were timed out and cancelled by slurm, mostly multiband jobs. For new runs, Hsin-Fang Chiang chose to start over with a new output repo rather than letting the driver reuse the existing data. Manual butler repo manipulation was needed to clean up bad executions or combine results.
+Although large time limits were deliberately used in the slurm jobs, several jobs were timed out and cancelled by slurm, mostly multiband jobs. For new runs, we chose to start over with a new output repo rather than letting the driver reuse the existing data. Manual butler repo manipulation was needed to clean up bad executions or combine results.
 
-The pipe{\_}drivers submission could take a while (minutes).
+The pipe{\_}drivers submission could take a few minutes to start each job.
 
-For S17B, the pipeline outputs were written to a production scratch space.  The rerun repos were cleaned up and failures were resolved there. Then the repos were transferred to the archived space at /datasets.  For transferring, this script was helpful: https://wiki.ncsa.illinois.edu/display/~wglick/2013/11/01/Parallel+Rsync
+For S17B, the pipeline outputs were written to a production scratch space.  The rerun repos were cleaned up and failures were resolved there. Then the repos were transferred to the archived space at /datasets.  For transferring, a script to do parallel syncing on a worker node was used; an example is on \url{https://wiki.ncsa.illinois.edu/display/~wglick/2013/11/01/Parallel+Rsync}.
 
 
 \section{Resource Usage}
