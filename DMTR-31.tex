@@ -15,7 +15,7 @@
 % \setDocSubtitle{A subtitle}
 
 \author{%
-Hsin-Fang Chiang, Greg Daues, and the NCSA team
+Hsin-Fang Chiang, Greg Daues, Samantha Thrush, and the NCSA team
 }
 
 \setDocRef{TEST-31}
@@ -247,6 +247,115 @@ Although large time limits were deliberately used in the slurm jobs, several job
 The pipe{\_}drivers submission could take a while (minutes).
 
 For S17B, the pipeline outputs were written to a production scratch space.  The rerun repos were cleaned up and failures were resolved there. Then the repos were transferred to the archived space at /datasets.  For transferring, this script was helpful: https://wiki.ncsa.illinois.edu/display/~wglick/2013/11/01/Parallel+Rsync
+
+
+\section{Resource Usage}
+
+\subsection{Disk Usage}
+
+The figures show the disk usage in the production scratch space, which was reserved purely for this S17B campaign use. Tests and failed runs wrote to this space as well.  At hour ~275, removal of some older data in this scratch space was performed so the drop should be ignored.
+\begin{figure}[htbp]
+        \begin{center}
+                 \includegraphics[width=0.45\textwidth]{figures/df_focus}
+                 \includegraphics[width=0.45\textwidth]{figures/df}
+                 \caption{Disk Usage of the production scratch space throughout the S17B reprocessing}
+        \end{center}
+\end{figure}
+
+The resultant data products are archived in 4 folders at /datasets/hsc/repo/rerun/DM-10404/. In total there are 11594219 files. The large files are typically hundreds of MBs.  The average size is ~14MB. The file size distribution is as the plot below:
+
+\begin{figure}[htbp]
+        \begin{center}
+                 \includegraphics[width=\textwidth]{figures/file_size_dist}
+                 \caption{file size distribution of the output repos}
+        \end{center}
+\end{figure}
+
+In terms of butler dataset types, the plots below show the distributions for SFM products and others.  All plots are in log scale.
+
+\begin{figure}[htbp]
+        \begin{center}
+                 \includegraphics[width=0.7\textwidth]{figures/butler_size_sfm}
+                 \includegraphics[width=0.7\textwidth]{figures/butler_size_duw}
+                 \caption{Size distribution across butler types}
+        \end{center}
+\end{figure}
+
+\subsection{CPU Usage}
+
+Total CPU = 79246 core-hours  ~471.7 core-weeks
+Total User CPU = 76246 core-hours  ~453.8 core-weeks
+
+The core-hours spent at each pipeline step are:
+\begin{enumerate}
+\item
+sfm: 19596.9
+\item
+mosaic: 943.2
+\item
+coadd: 5444.9
+\item
+multiband: 34127.2
+\item
+forcedPhotCcd: 19133.9
+\end{enumerate}
+
+\begin{figure}[htbp]
+        \begin{center}
+                 \includegraphics[width=0.6\textwidth]{figures/cpuPieChart}
+        \end{center}
+\end{figure}
+
+The figure below shows the "efficiency", calculated by dividing the total cpu time by wall elapsed time * number of cores, for each pipeline.
+
+\begin{figure}[htbp]
+        \begin{center}
+                 \includegraphics[width=\textwidth]{figures/efficiency}
+        \end{center}
+\end{figure}
+
+ general feature of the plots is that the efficiency is observed to be bounded/limited by the fact that with ctrl{\_}pool/mpi the MPI root process is mostly idle and occupies one core.  This correlates with an upper bound for SFM of 23/24 ~0.958 , for coadd processing of 11/12 ~ 0.916, etc.
+sfm: Every 11 visits are grouped into one job, and each visit has 103 ccds. Thus, 1133 ccds were processed in a job, divided amongst 24 cores. Each ccd took around 2 minutes in average; in other words, roughly 90 min of wall clock elapsed time and 36 hr of accumulated CPU time per job. Efficiency is uniformly good. SingleFrameDriverTask is a ctrl{\_}pool BatchParallelTask.  The histogram below shows the CPU time of the SFM slurm jobs. The job IDs of the longest running jobs are: 51245, 51320, 51371, 51483, 51496, 51497, 51525, 51533, 51534, 51536, 51546, 51547, 51548, 51549, 51550, 51582, 51587, 51602, 51603
+\begin{figure}[htbp]
+        \begin{center}
+                 \includegraphics[width=\textwidth]{figures/cpu_sfm}
+        \end{center}
+\end{figure}
+
+mosaic: The unit of processing is each tract x filter on a node for each layer.  Mosaic jobs used 12 cores for reading source catalogs, via Python multiprocessing, but 1 core for other parts of the task; therefore we did not calculate the efficiency as it would be misleading. MosaicTask does not use ctrl{\_}pool.
+coadd: coadd jobs are chosen to process a tract on a node. One tract has 9*9=81 patches. CoaddDriverTask is a ctrl{\_}pool  BatchPoolTask. In most cases the patches are processed “12 wide” using ctrl{\_}pool, distributing the work to 12 cores on a node. Using mpi based ctrl{\_}pool in this context leads to one mostly idle MPI root process and 11 workers.  As Verification nodes have 128 GB RAM, this gives on average ~ 11 GB of memory per patch, with the aggregate  able to use the 128 GB.
+MultiBandDriver is a ctrl{\_}pool  BatchPoolTask.
+Six multiband jobs (9476-mbWIDE9219, 59482-mbWIDE9737,59484-mbWIDE10050, 59485-mbWIDE10188,59486-mbWIDE16003, 59316-mbUDEEP8522) were excluded from this figure; their elapsed times were very short and had very bad efficiencies but they are from tracks outside of the survey coverage.
+Some of the forcedPhotCcd jobs run as only one task on one node had very high efficiency but this gave bad throughput.
+Below are the histograms of the maximum resident set size and the virtual memory size for mosaic and forcedPhotCcd. Memory Memory monitoring of ctrl{\_}pool driver jobs (singleFrameDriver, coaddDriver, multiBandDriver) was problematic and we do not believe in the numbers collected, so we do not plot them.
+
+\begin{figure}[htbp]
+        \begin{center}
+                 \includegraphics[width=\textwidth]{figures/maxm_mosaic}
+                 \includegraphics[width=\textwidth]{figures/maxm_forcPhotCcd}
+        \end{center}
+\end{figure}
+
+
+
+\subsection{Node Utilization}
+
+The Verification Cluster in its optimal state has 48 compute nodes with 24 physical cores, 256 GB RAM on each node.  For the duration of the S17B reprocessing there was a peak of 45 compute nodes available. The plot does not include failed jobs or test attempts, of which the generated data do not contribute to the final results directly.
+
+\begin{figure}[htbp]
+        \begin{center}
+                 \includegraphics[width=\textwidth]{figures/nodeUtilization}
+                 \caption{hourly node usage \label{fig:node}}
+        \end{center}
+\end{figure}
+
+\section{Other Relevant JIRA tickets}
+\jira{DM-10782}
+\jira{DM-10761}
+\jira{DM-10624}
+\jira{DM-10413}
+\jira{DM-11171}
+
 
 % Include all the relevant bib files.
 % https://lsst-texmf.lsst.io/lsstdoc.html#bibliographies
