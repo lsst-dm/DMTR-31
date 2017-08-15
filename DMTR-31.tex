@@ -176,7 +176,83 @@ forcedPhotCcd.py  forcedPhotCcd.py /datasets/hsc/repo --rerun path2
 \end{enumerate}
 
 
-\section{Processing Notes and Reproducible Failures}
+\section{Processing Notes}
+\subsection{Processing of the Release Candidate}
+
+A Release Candidate ("RC") dataset has been defined and used in the test processing before the full processing started.
+
+The RC dataset was originally defined in https://hsc-jira.astro.princeton.edu/jira/browse/HSC-1361 for hscPipe 3.9.0.
+The RC dataset is public and available at /datasets/. 62 visits of them were not included in PDR1 (\jira{DM-10128}): two of SSP{\_}WIDE and 60 of SSP{\_}UDEEP{\_}COSMOS; their visit IDs are 274 276 278 280 282 284 286 288 290 292 294 296 298 300 302 306 308 310 312 314 316 320 334 342 364 366 368 370 1236 1858 1860 1862 1878 9864 9890 11742 28354 28356 28358 28360 28362 28364 28366 28368 28370 28372 28374 28376 28378 28380 28382 28384 28386 28388 28390 28392 28394 28396 28398 28400 28402 29352.
+
+The RC dataset includes (a) 237 visits of SSP{\_}UDEEP{\_}COSMOS and (b) 83 visits of SSP{\_}WIDE, in 6 bands.
+
+\begin{enumerate}
+\item Cosmos to full depth: (part of SSP{\_}UDEEP{\_}COSMOS)
+\begin{enumerate}
+\item
+HSC-G \begin{verbatim} 11690..11712:2^29324^29326^29336^29340^29350^29352
+\end{verbatim}
+\item
+HSC-R \begin{verbatim}1202..1220:2^23692^23694^23704^23706^23716^23718
+\end{verbatim}
+\item
+HSC-I \begin{verbatim}1228..1232:2^1236..1248:2^19658^19660^19662^19680^19682^19684^19694^19696
+^19698^19708^19710^19712^30482..30504:2
+\end{verbatim}
+\item
+HSC-Y \begin{verbatim}274..302:2^306..334:2^342..370:2^1858..1862:2^1868..1882:2^11718..11742:2
+^22602..22608:2^22626..22632:2^22642..22648:2^22658..22664:2
+\end{verbatim}
+\item
+HSC-Z \begin{verbatim}1166..1194:2^17900..17908:2^17926..17934:2^17944..17952:2^17962^28354..28402:2
+\end{verbatim}
+\item
+NB0921 \begin{verbatim}23038..23056:2^23594..23606:2^24298..24310:2^25810..25816:2
+\end{verbatim}
+\end{enumerate}
+\item Two tracts of wide: (part of SSP{\_}WIDE)
+\begin{enumerate}
+\item
+HSC-G \begin{verbatim}9852^9856^9860^9864^9868^9870^9888^9890^9898^9900^9904^9906^9912^11568^11572
+^11576^11582^11588^11590^11596^11598
+\end{verbatim}
+\item
+HSC-R \begin{verbatim}11442^11446^11450^11470^11476^11478^11506^11508^11532^11534
+\end{verbatim}
+\item
+HSC-I \begin{verbatim}7300^7304^7308^7318^7322^7338^7340^7344^7348^7358^7360^7374^7384^7386^19468
+^19470^19482^19484^19486
+\end{verbatim}
+\item
+HSC-Y \begin{verbatim}6478^6482^6486^6496^6498^6522^6524^6528^6532^6544^6546^6568^13152^13154
+\end{verbatim}
+\item
+HSC-Z \begin{verbatim}9708^9712^9716^9724^9726^9730^9732^9736^9740^9750^9752^9764^9772^9774^17738
+^17740^17750^17752^17754
+\end{verbatim}
+\end{enumerate}
+\end{enumerate}
+
+The w{\_}2017{\_}17 stack and meas{\_}mosaic ecfbc9d built with w{\_}2017{\_}17 was used in the RC reprocessing (\jira{DM-10129}.
+In singleFrameDriver, there were reproducible failures in 46 ccds from 23 visits. The failed visit/ccds are the same as those in the w{\_}2017{\_}14 stack (\jira{DM-10084}). Their data IDs are:
+\begin{verbatim}
+ --id visit=278 ccd=95 --id visit=280 ccd=22^69 --id visit=284 ccd=61
+ --id visit=1206 ccd=77 --id visit=6478 ccd=99 --id visit=6528 ccd=24^67
+ --id visit=7344 ccd=67 --id visit=9736 ccd=67 --id visit=9868 ccd=76
+ --id visit=17738 ccd=69 --id visit=17750 ccd=58 --id visit=19468 ccd=69
+ --id visit=24308 ccd=29 --id visit=28376 ccd=69 --id visit=28380 ccd=0
+ --id visit=28382 ccd=101 --id visit=28392 ccd=102 --id visit=28394 ccd=93
+ --id visit=28396 ccd=102 --id visit=28398 ccd=95^101
+ --id visit=28400 ccd=5^10^15^23^26^40^53^55^61^68^77^84^89^92^93^94^95^99^100^101^102
+ --id visit=29324 ccd=99 --id visit=29326 ccd=47
+\end{verbatim}
+
+In WIDE, the coadd products have all 81 patches in both tracts (8766, 8767) in 5 filters, except that there is no coadd in tract 8767 patch 1,8 in HSC-R (nothing passed the PSF quality selection there); the multiband products of all 162 patches are generated.
+
+In COSMOS, the coadd products have 77 patches in tract 9813 in HSC-G, 74 in HSC-R, 79 in HSC-I, 79 in HSC-Y, 79 in HSC-Z, and 76 in NB0921; the multiband products of 79 patches are generated.
+
+"brightObjectMask" were not applied; but they should not affect. forcedPhotCcd.py was not run in the RC processing.
+
 \subsection{Summary of Outputs}
 All processing were done with the same stack setup. Data of the three layers (UDEEP, DEEP, WIDE) were processed separately.
 The output repositories are at:
