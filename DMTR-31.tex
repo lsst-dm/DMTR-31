@@ -314,10 +314,10 @@ Out of the 78 failures:
 15 failed with: "PSF star selector found [123] candidates"
 \end{enumerate}
 
-In multiBandDriver, two patches of WIDE (tract=9934 patch=0,0  and  tract=9938 patch=0,0) failed with AssertionError as reported in \jira{DM-10574}. I excluded the failed patches from the multiBandDriver commands, and then jobs were able to complete and process all other patches.
+In multiBandDriver, two patches of WIDE (tract=9934 patch=0,0  and  tract=9938 patch=0,0) failed with AssertionError as reported in \jira{DM-10574}. I excluded the failed patches from the multiBandDriver commands, and then jobs were able to complete and process all other patches. \jira{DM-10574} has then been fixed.
 
 The multiBandDriver job of WIDE tract=9457 could not finish unless patch=1,8 is excluded. However tract 9457 is actually outside of the PDR1 coverage.
-In forcedPhotCcd, fatal errors were seen about the reference of a patch does not exist; therefore some forced{\_}src were not generated. A JIRA ticket has been filed: \jira{DM-10755}.
+In forcedPhotCcd, fatal errors were seen about the reference of a patch does not exist; therefore some forced{\_}src were not generated. A JIRA ticket \jira{DM-10755} has been filed but not fixed as of Aug 18 2017.
 
 \subsection{Low-level Processing Details}
 
