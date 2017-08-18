@@ -69,7 +69,7 @@ is summarized in \tabref{tab:tractIds}.
 
 \input{tractTable}
 
-Plots of tracts and patches can be found on  https://hsc-release.mtk.nao.ac.jp/doc/index.php/data/. In S17B, more tracts than listed were processed.
+Plots of tracts and patches can be found on  \url{https://hsc-release.mtk.nao.ac.jp/doc/index.php/data/}. In S17B, processing of some edge tracts not listed in \tabref{tab:tractIds} was attempted and those data were not removed from the output repos. Those data can be ignored; see \ref{summaryOutputs}.
 
 \section{Hardware}
 The processing was done using the Verification Cluster.
@@ -253,7 +253,7 @@ In COSMOS, the coadd products have 77 patches in tract 9813 in HSC-G, 74 in HSC-
 
 "brightObjectMask" were not applied; but they should not affect. forcedPhotCcd.py was not run in the RC processing.
 
-\subsection{Summary of Outputs}
+\subsection{Summary of Outputs} \label{summaryOutputs}
 All processing were done with the same stack setup. Data of the three layers (UDEEP, DEEP, WIDE) were processed separately.
 The output repositories are at:
 \begin{verbatim}
@@ -263,7 +263,7 @@ The output repositories are at:
 \end{verbatim}
 All logs are at /datasets/hsc/repo/rerun/DM-10404/logs/
 
-While unnecessary, some edge tracts outside of the PDR1 coverage were attempted in the processing this time. Those data outputs are kept in the repos as well. In other words, there are more tracts in the above output repositories than listed in the tract IDs in the table on top of this page; the additional data can be ignored.
+While unnecessary, some edge tracts outside of the PDR1 coverage were attempted in the processing this time. Those data outputs are kept in the repos as well. In other words, there are more tracts in the above output repositories than listed in the tract IDs in \tabref{tab:tractIds}. The additional data can be ignored.
 
 \subsection{Reproducible Failures}
 In singleFrameDriver/processCcd, there were reproducible failures in 78 CCDs from 74 visits. Their data IDs are:
