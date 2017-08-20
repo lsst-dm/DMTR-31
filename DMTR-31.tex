@@ -477,12 +477,22 @@ The Verification Cluster in its optimal state has 48 compute nodes with 24 physi
         \end{center}
 \end{figure}
 
-\section{Other Relevant JIRA tickets}
-\jira{DM-10782}
-\jira{DM-10761}
-\jira{DM-10624}
-\jira{DM-10413}
-\jira{DM-11171}
+\section{Triggered JIRA tickets}
+Some of the stack issues identified during the S17B Reprocessing
+have been turned into actionable JIRA tickets.
+Tickets for Science Pipelines improvements are
+\jira{DM-10574} (Hit AssertionError in deblender),
+\jira{DM-10755} (forcedPhotCcd.py fails with the non-existing reference of a barely-overlapping patch),
+\jira{DM-10782} (Add bright star masks to ci{\_}hsc), and
+\jira{DM-10413} (Please complain louder if brightObjectMask cannot be found).
+Tickets for Middleware improvements are
+\jira{DM-10761} (Failed CmdLineTask does not give nonzero exit code; resolved by \jira{}),
+\jira{DM-10624} (Duplicate log files from running pipe{\_}drivers tasks), and
+\jira{DM-11171} (Please separate algorithmic configs and operational configs in the task framework).
+
+Many of the low-level processing issues are related to either the task framework design or the Data Butler.
+Issues related to the framework design were not turned into JIRA tickets,
+but concerns were brought to the SuperTask Working Group and Butler Working Group.
 
 
 % Include all the relevant bib files.
