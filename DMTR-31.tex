@@ -48,7 +48,7 @@ This document captures information about the large scale HSC reprocessing we per
 The input dataset is the HSC Strategic Survey Program (SSP) Public Data Release 1 (PDR1) \citep{2017arXiv170208449A}.
 The PDR1 dataset has been transferred to the LSST GPFS storage /datasets by \jira{DM-9683} and the butler repo is available at /datasets/hsc/repo.
 
-It includes 5654 visits in 7 bands: HSC-G, HSC-R, HSC-I, HSC-Y, HSC-Z, NB0816, NB0921. Their visit IDs are visitId-SSPPDR1.txt.  The official release site is at https://hsc-release.mtk.nao.ac.jp/
+It includes 5654 visits in 7 bands: HSC-G, HSC-R, HSC-I, HSC-Y, HSC-Z, NB0816, NB0921. A file including all visit IDs is attached to the confluence page.  The official release site is at https://hsc-release.mtk.nao.ac.jp/
 The survey has three layers and includes 8 fields.
 \begin{enumerate}
 \item
@@ -100,15 +100,27 @@ The externally provided bright object masks (butler type "brightObjectMask") of 
 \item
 makeSkyMap.py
 \item
-singleFrameDriver.py     Ignore ccd=9 which has bad amps and results not trustworthy even if processCcd passes
+singleFrameDriver.py
+\begin{enumerate}
+\item [-]
+Note: Ignore ccd=9 which has bad amps and results not trustworthy even if processCcd passes
+\end{enumerate}
 \item
 mosaic.py
 \item
-coaddDriver.py   Make config.assembleCoadd.subregionSize small enough so a full stack of images can fit into memory at once; a trade-off between memory and i/o but doesn't matter scientifically, as the pixels are independent.
+coaddDriver.py
+\begin{enumerate}
+\item [-]
+Note: Make config.assembleCoadd.subregionSize small enough so a full stack of images can fit into memory at once; a trade-off between memory and i/o but doesn't matter scientifically, as the pixels are independent.
+\end{enumerate}
 \item
 multiBandDriver.py
 \item
-forcedPhotCcd.py   Note: it was added late and hence was not run in the RC processing
+forcedPhotCcd.py
+\begin{enumerate}
+\item [-]
+Note: it was added late and hence was not run in the RC processing
+\end{enumerate}
 \end{enumerate}
 
 Operational configurations, such as logging configurations in $ctrl{\_}pool$, different from the tagged stack may be used (e.g. \jira{DM-10430}).
@@ -233,7 +245,7 @@ HSC-Z \begin{verbatim}9708^9712^9716^9724^9726^9730^9732^9736^9740^9750^9752^976
 \end{enumerate}
 \end{enumerate}
 
-The w{\_}2017{\_}17 stack and meas{\_}mosaic ecfbc9d built with w{\_}2017{\_}17 was used in the RC reprocessing (\jira{DM-10129}.
+The w{\_}2017{\_}17 stack and meas{\_}mosaic ecfbc9d built with w{\_}2017{\_}17 was used in the RC reprocessing (\jira{DM-10129}).
 In singleFrameDriver, there were reproducible failures in 46 ccds from 23 visits. The failed visit/ccds are the same as those in the w{\_}2017{\_}14 stack (\jira{DM-10084}). Their data IDs are:
 \begin{verbatim}
  --id visit=278 ccd=95 --id visit=280 ccd=22^69 --id visit=284 ccd=61
@@ -314,14 +326,14 @@ Out of the 78 failures:
 15 failed with: "PSF star selector found [123] candidates"
 \end{enumerate}
 
-In multiBandDriver, two patches of WIDE (tract=9934 patch=0,0  and  tract=9938 patch=0,0) failed with AssertionError as reported in \jira{DM-10574}. I excluded the failed patches from the multiBandDriver commands, and then jobs were able to complete and process all other patches. \jira{DM-10574} has then been fixed.
+In multiBandDriver, two patches of WIDE (tract=9934 patch=0,0  and  tract=9938 patch=0,0) failed with AssertionError as reported in \jira{DM-10574}. We excluded the failed patches from the multiBandDriver commands, and then jobs were able to complete and process all other patches. \jira{DM-10574} has then been fixed.
 
 The multiBandDriver job of WIDE tract=9457 could not finish unless patch=1,8 is excluded. However tract 9457 is actually outside of the PDR1 coverage.
 In forcedPhotCcd, fatal errors were seen about the reference of a patch does not exist; therefore some forced{\_}src were not generated. A JIRA ticket \jira{DM-10755} has been filed but not fixed as of Aug 18 2017.
 
 \subsection{Low-level Processing Details}
 
-This section includes low-level details that may only be of interest to the operation team.
+This section includes low-level details that may only be of interest to the Operations team.
 
 The first singleFrame job started on May 8, the last multiband job was May 22, and the last forcedPhotCcd job was on Jun 1.  The processing was done using the Verification Cluster and the GPFS space mounted on it. The NCSA team was responsible of shepherding the run and resolving non-pipeline issues, with close communications with and support from the DRP team regarding the science pipelines.  The "ctrl{\_}pool" style drivers were run on the slurm cluster.
 
@@ -340,9 +352,11 @@ The processing tasks/drivers were run as a total of 8792 slurm jobs:
 \end{enumerate}
 Their slurm job IDs can be found on the confluence page.
 
-For single frame processing, every 11 visits (an arbitrary choice) were grouped into one singleFrameDriver.py command, therefore 5654/11 = 514 jobs in total, and submitted each job to one worker node.  Data of the three layers (DEEP, UDEEP, WIDE) were handled completely separately beginning with the mosaic pipeline step.  skymap.findTractPatchList was used to check through each calexp, find out what tract/patch the ccd overlaps, and write into sqlite3. There are 1555 tract x filter combinations for all three layers. For each tract x filter, all overlapping visits and a template were used to make a slurm job file (similar to the .sl file as in \url{https://developer.lsst.io/services/verification.html#verification-slurm}). Similarly for coadd making, each tract x filter was a slurm job, but jobs were submitted using coaddDriver.py.  The multiband processing jobs were submitted for each tract, using multiBandDriver.py.   All numbers here included tracts that were not actually necessary (outside the PDR1 coverage).  For forcedPhotCcd, the CmdLineTask command is written into slurm job files for submission, similar to running mosaic. 21 visits (an arbitrary choice) were grouped in each slurm job in the first batch of submissions; the rest had one visit in each slurm job. In this campaign, at most 24 cores were used on one node at a time and sometimes even fewer.   We were aware that jobs were not run in the optimal way, and they are to be improved in the coming cycles.
+For single frame processing, every 11 visits (an arbitrary choice to divide work into a manageable number of jobs) were grouped into one singleFrameDriver.py command, therefore 5654/11 = 514 jobs in total, and submitted each job to one worker node.  Data of the three layers (DEEP, UDEEP, WIDE) were handled completely separately beginning with the mosaic pipeline step.  skymap.findTractPatchList was used to check through each calexp, find out what tract/patch the ccd overlaps, and write into sqlite3. There are 1555 tract x filter combinations for all three layers. For each tract x filter, all overlapping visits and a template were used to make a slurm job file (similar to the .sl file as in \url{https://developer.lsst.io/services/verification.html#verification-slurm}). Similarly for coadd making, each tract x filter was a slurm job, but jobs were submitted using coaddDriver.py.  The multiband processing jobs were submitted for each tract, using multiBandDriver.py.   All numbers here included tracts that were not actually necessary (outside the PDR1 coverage).  For forcedPhotCcd, the CmdLineTask command is written into slurm job files for submission, similar to running mosaic. 21 visits (an arbitrary choice) were grouped in each slurm job in the first batch of submissions; the rest had one visit in each slurm job. In this campaign, at most 24 cores were used on one node at a time and sometimes even fewer.   We were aware that jobs were not run in the optimal way, and they are to be improved in the coming cycles.
 
-In general, when jobs failed, little effort was spent into investigation as long as the reruns were successful. There were a few transient hardware/file system issues. For example, once a known GPFS hiccup failed two jobs; we happened to know because admins happened to notice it and we happened to match up the timing within a few minutes, but issues like that could easily happen without being noticed.  Other examples of other non-science-pipeline failures are as below.
+In general, when jobs failed, little effort was spent into investigation as long as the reruns were successful. There were a few transient hardware/file system issues. For example, once a known GPFS hiccup failed two jobs;
+we became aware because admins flagged an issue and we happened to match up the timings within a few minutes, but issues like that could easily happen without being noticed.
+Other examples of other non-science-pipeline failures are as below.
 
 Failures like the "black hole node" phenomenon were seen a few times. Sometimes many jobs were queued in slurm, and next morning all jobs larger than a job ID were found to be failed without any log being written.  The appearance is that Slurm scheduled numerous jobs in succession, one after another, to a faulty node with a GPFS problem, resulting in a set of failed jobs.   Jobs that started running before that failure point were able to continue as normal. Resubmissions of the same failed jobs were also good.   The observation of a succession of jobs all going to the same problematic node and failing over and over again in a short amount of time motivates an examination of the controller configuration, as there may be Slurm settings that would distribute job and avoid the scenario.
 
@@ -468,7 +482,7 @@ Figure \ref{fig:maxm} show the histograms of the maximum resident set size and t
 \subsection{Node Utilization}
 
 Figure \ref{fig:node} shows the node utilization throughout the campaign.
-The Verification Cluster in its optimal state has 48 compute nodes with 24 physical cores, 256 GB RAM on each node.  For the duration of the S17B reprocessing there was a peak of 45 compute nodes available. The plot does not include failed jobs or test attempts, of which the generated data do not contribute to the final results directly.
+The Verification Cluster in its optimal state has 48 compute nodes with 24 physical cores, 128 GB RAM on each node.  For the duration of the S17B reprocessing there was a peak of 45 compute nodes available. The plot does not include failed jobs or test attempts, of which the generated data do not contribute to the final results directly.
 
 \begin{figure}[htbp]
         \begin{center}
