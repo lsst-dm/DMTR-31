@@ -383,12 +383,53 @@ Figure \ref{fig:df} shows the disk usage in the production scratch space, which 
         \end{center}
 \end{figure}
 
-The resultant data products are archived in 4 folders at /datasets/hsc/repo/rerun/DM-10404/. In total there are 11594219 files. The large files are typically hundreds of MBs.  The average size is ~14MB. The file size distribution is in Figure \ref{fig:file_size_dist}.
+The resultant data products include 11594219 files in total.
+The large files are typically hundreds of MBs.  The average size is around 14 MB. The file size distribution is in Figure \ref{fig:file_size_dist}.
+The data products are archived in 4 folders at the GPFS space /datasets/hsc/repo/rerun/DM-10404/.
+The number of files in each folder is shown in Figure \ref{fig:num_dir_files}.
+Below we summarize the output repositories in each folder.
+
+\begin{enumerate}
+\item
+\textbf{SFM}
+Overall there are 4664198 files.
+The smallest data products are BKDG fits files which all take up 128K each.
+The largest data products are CORR fits files which take up 82M each.
+The average file size is 11.7 M. The number of files above 1M was 1358136 and the number of files with size less than 1M was 3307875.
+\item
+\textbf{DEEP}
+There are 829604 files in total.
+The 2000 largest files ranged in size from 479M to 177M, all of which existed within deepCoadd-results and were fits files. While the vast majority were meas fits files associated with a filter folder within deepCoadd-results, some were ref fits files which were associated with the ./deepCoadd-results/merged/ folder.
+The 2000 smallest files were all boost files of size 0B, all of which were contained within this folder path 00991/HSC-Y/tract\{number\}/forcedPhotCcd-metadata/.
+Although all of these files considered here are in the HSC-Y filter, there exists many other similar files within the other filters as well.
+The files had an average size of 15.5M. There were 196034 files above 1M and 705548 files below.
+\item
+\textbf{UDEEP}
+There are 411557 files in total.
+The 2000 largest files here are similar to the DEEP folder described above; most of the large files were meas fits or calexp fits files located within the filter folders of ./deepCoadd-results/, while a few of them were ref fits files located in the folder ./deepCoadd-results/merged/.
+The files ranged in size from 446M to 172M.
+The 2000 smallest files had a situation similar to that described in the DEEP folder above: all of the smallest files were of size 0B, were boost files, and were all located in ./00814/HSC-Y/tract\{number\}/forcedPhotCcd-metadata or other filters.
+The files had an average size of 16.7M. There were 95071 files above 1M and 316486 files below.
+\item
+\textbf{WIDE}
+There are 5688860 files in total.
+This folder by far had the largest files. Of the 2000 largest files, the largest was 1.1G and the smallest was 209M. The WIDE directory houses the only file over 1Gb. The files here were like the largest found in the DEEP folder: most of them were meas fits files located in the filter folders of ./deepCoadd-results/ while a few of them were ref fits files located within ./deepCoadd-results/merged/.
+The 2000 smallest files were exactly like those found in the UDEEP folder above.
+The files had an average size of 15.7M. There were 1417818 files above 1M and 4271042 files below.
+\end{enumerate}
 
 \begin{figure}[htbp]
         \begin{center}
-                 \includegraphics[width=\textwidth]{figures/file_size_dist}
-                 \caption{file size distribution of the output repos}
+                 \includegraphics[width=0.6\textwidth]{figures/num_dir_files}
+                 \caption{The number of files in each output folder. Note that the y-axis here is on a log-scale.}
+                 \label{fig:num_dir_files}
+        \end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+        \begin{center}
+                 \includegraphics[width=0.6\textwidth]{figures/file_size_dist}
+                 \caption{file size distribution of the output repos. Note that the y-axis here is on a log-scale.}
                  \label{fig:file_size_dist}
         \end{center}
 \end{figure}
