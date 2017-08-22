@@ -187,6 +187,49 @@ forcedPhotCcd.py  forcedPhotCcd.py /datasets/hsc/repo --rerun path2
 \end{verbatim}
 \end{enumerate}
 
+\subsection{Butler HscMapper Policy Templates}
+For the software stack version used in S17B reprocessing, the following templates are implied in the Butler repositories.
+
+\begin{verbatim}
+calexp: %(pointing)05d/%(filter)s/corr/CORR-%(visit)07d-%(ccd)03d.fits
+calexpBackground: %(pointing)05d/%(filter)s/corr/BKGD-%(visit)07d-%(ccd)03d.fits
+icSrc: %(pointing)05d/%(filter)s/output/ICSRC-%(visit)07d-%(ccd)03d.fits
+src: %(pointing)05d/%(filter)s/output/SRC-%(visit)07d-%(ccd)03d.fits
+srcMatch: %(pointing)05d/%(filter)s/output/SRCMATCH-%(visit)07d-%(ccd)03d.fits
+srcMatchFull: %(pointing)05d/%(filter)s/output/SRCMATCHFULL-%(visit)07d-%(ccd)03d.fits
+ossImage: %(pointing)05d/%(filter)s/thumbs/oss-%(visit)07d-%(ccd)03d.fits
+flattenedImage: %(pointing)05d/%(filter)s/thumbs/flattened-%(visit)07d-%(ccd)03d.fits
+
+wcs: jointcal-results/%(tract)04d/wcs-%(visit)07d-%(ccd)03d.fits
+fcr: jointcal-results/%(tract)04d/fcr-%(visit)07d-%(ccd)03d.fits
+
+brightObjectMask:
+deepCoadd/BrightObjectMasks/%(tract)d/BrightObjectMask-%(tract)d-%(patch)s-%(filter)s.reg
+(externally provided)
+
+deepCoadd_tempExp:
+deepCoadd/%(filter)s/%(tract)d/%(patch)s/warp-%(filter)s-%(tract)d-%(patch)s-%(visit)d.fits
+deepCoadd_calexp:
+deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s.fits
+deepCoadd_det:
+deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/det-%(filter)s-%(tract)d-%(patch)s.fits
+deepCoadd_calexp_background:
+deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/det_bkgd-%(filter)s-%(tract)d-%(patch)s.fits
+
+deepCoadd_meas:
+deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/meas-%(filter)s-%(tract)d-%(patch)s.fits
+deepCoadd_measMatch:
+deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits
+deepCoadd_measMatchFull:
+deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatchFull-%(filter)s-%(tract)d-%(patch)s.fits
+deepCoadd_mergeDet:
+deepCoadd-results/merged/%(tract)d/%(patch)s/mergeDet-%(tract)d-%(patch)s.fits
+deepCoadd_ref: deepCoadd-results/merged/%(tract)d/%(patch)s/ref-%(tract)d-%(patch)s.fits
+deepCoadd_forced_src:
+deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/forced_src-%(filter)s-%(tract)d-%(patch)s.fits
+
+forced_src: %(pointing)05d/%(filter)s/tract%(tract)d/FORCEDSRC-%(visit)07d-%(ccd)03d.fits
+\end{verbatim}
 
 \section{Processing Notes}
 \subsection{Processing of the Release Candidate}
